@@ -1,0 +1,12 @@
+spring:
+  application:
+  name: smartdelivery
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/smartdelivery
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
