@@ -1,5 +1,6 @@
 package br.com.iago.smartdelivery.modules.customers;
 
+import br.com.iago.smartdelivery.modules.customers.dto.CreateCustomerRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,9 +19,9 @@ public class CustomerController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody CustomerEntity customerEntity) throws Exception {
+    public ResponseEntity<?> create(@RequestBody CreateCustomerRequest createCustomerRequest) throws Exception {
         try{
-            createCustomerUseCase.execute(customerEntity);
+            createCustomerUseCase.execute(createCustomerRequest);
             return ResponseEntity.ok().build();
         } catch(IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());

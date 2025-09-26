@@ -1,5 +1,6 @@
 package br.com.iago.smartdelivery.modules.customers;
 
+import br.com.iago.smartdelivery.modules.users.UserEntity;
 import jakarta.persistence.*;
 
 import java.util.UUID;
@@ -12,7 +13,6 @@ public class CustomerEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String name;
-    private String password;
     private String phone;
 
     @Column(unique = true)
@@ -20,15 +20,22 @@ public class CustomerEntity {
     private String address;
     private String zipcode;
 
+    @Column(name = "user_id")
+    private UUID userId;
+
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
+    private UserEntity user;
+
     public CustomerEntity(){}
 
-    public CustomerEntity(String name, String password, String phone, String email, String address, String zipcode) {
+    public CustomerEntity(String name, String password, String phone, String email, String address, String zipcode, UUID userId) {
         this.name = name;
-        this.password = password;
         this.phone = phone;
         this.email = email;
         this.address = address;
         this.zipcode = zipcode;
+        this.userId = userId;
     }
 
     public UUID getId() {
@@ -45,14 +52,6 @@ public class CustomerEntity {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getPhone() {
@@ -87,13 +86,19 @@ public class CustomerEntity {
         this.zipcode = zipcode;
     }
 
-    @Override
-    public String toString() {
-        return "CustomerEntity{" +
-                "name='" + name + '\'' +
-                ", phone='" + phone + '\'' +
-                ", email='" + email + '\'' +
-                ", address='" + address + '\'' +
-                '}';
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 }
