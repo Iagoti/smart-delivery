@@ -4,6 +4,7 @@ import br.com.iago.smartdelivery.ViaCepDTO;
 import br.com.iago.smartdelivery.modules.customers.dto.CreateCustomerRequest;
 import br.com.iago.smartdelivery.modules.users.CreateUserCase;
 import br.com.iago.smartdelivery.modules.users.Role;
+import br.com.iago.smartdelivery.modules.users.UserEntity;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -33,11 +34,13 @@ public class CreateCustomerUseCase {
             throw new IllegalArgumentException("Erro ao consultar o CEP " + createCustomerRequest.getZipcode());
         }
 
-        this.createUserCase.execute(createCustomerRequest.getEmail(), createCustomerRequest.getPassword(), Role.CUSTOMER);
+        UserEntity userEntity = this.createUserCase.execute(createCustomerRequest.getEmail(), createCustomerRequest.getPassword(), Role.CUSTOMER);
+
         customerEntity.setName(createCustomerRequest.getName());
         customerEntity.setPhone(createCustomerRequest.getPhone());
         customerEntity.setZipcode(createCustomerRequest.getZipcode());
         customerEntity.setEmail(createCustomerRequest.getEmail());
+        customerEntity.setUserId(userEntity.getId());
 
         this.customerRepository.findByEmail(customerEntity.getEmail())
                 .ifPresent(item -> {

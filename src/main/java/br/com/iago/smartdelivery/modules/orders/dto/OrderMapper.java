@@ -8,9 +8,9 @@ import java.util.UUID;
 
 public class OrderMapper {
 
-    public static OrderEntity toEntity(CreateOrderRequest request){
+    public static OrderEntity toEntity(CreateOrderRequest request, UUID customerId){
         OrderEntity order = new OrderEntity();
-        order.setCustomerId(request.customerId());
+        order.setCustomerId(customerId);
 
         List<ProductEntity> products = request.productsIds().stream()
                 .map(id -> {
