@@ -10,3 +10,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  rabbitmq:
+    addresses: amqps://yrhrcbif:kRsJHMJ44ateNHEEdG-bKgqPN1kcPAT5@shrimp.rmq.cloudamqp.com/yrhrcbif
+    username: yrhrcbif
+    password: kRsJHMJ44ateNHEEdG-bKgqPN1kcPAT5
+    virtual-host: yrhrcbif

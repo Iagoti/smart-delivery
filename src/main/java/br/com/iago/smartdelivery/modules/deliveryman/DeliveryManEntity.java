@@ -15,12 +15,16 @@ public class DeliveryManEntity {
     private String document;
     private String phone;
 
+    @Column(columnDefinition = "BOOLEAN DEFAULT true")
+    private boolean isAvailable;
+
     public DeliveryManEntity(){}
 
-    private DeliveryManEntity(String name, String phone, String document) {
+    private DeliveryManEntity(String name, String phone, String document, boolean isAvailable) {
         this.name = name;
         this.phone = phone;
         this.document = document;
+        this.isAvailable = isAvailable;
     }
 
     public UUID getId() {
@@ -55,10 +59,19 @@ public class DeliveryManEntity {
         this.phone = phone;
     }
 
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(boolean available) {
+        isAvailable = available;
+    }
+
     public static class Builder {
         private String name;
         private String phone;
         private String document;
+        private boolean isAvailable;
 
         public Builder name(String name) {
             this.name = name;
@@ -75,8 +88,13 @@ public class DeliveryManEntity {
             return this;
         }
 
+        public Builder isAvailable(boolean isAvailable) {
+            this.isAvailable = isAvailable;
+            return this;
+        }
+
         public DeliveryManEntity build() {
-            return new DeliveryManEntity(name, document, phone);
+            return new DeliveryManEntity(name, document, phone, isAvailable);
         }
     }
 }

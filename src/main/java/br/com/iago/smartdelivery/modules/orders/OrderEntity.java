@@ -1,6 +1,7 @@
 package br.com.iago.smartdelivery.modules.orders;
 
 import br.com.iago.smartdelivery.modules.customers.CustomerEntity;
+import br.com.iago.smartdelivery.modules.deliveryman.DeliveryManEntity;
 import br.com.iago.smartdelivery.modules.products.ProductEntity;
 import jakarta.persistence.*;
 
@@ -29,6 +30,13 @@ public class OrderEntity {
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
     private List<ProductEntity> products;
+
+    @Column(name="deliveryman_id")
+    private UUID deliveryManId;
+
+    @ManyToOne
+    @JoinColumn(name = "deliveryman_id", insertable = false, updatable = false)
+    private DeliveryManEntity deliveryManEntity;
 
     @Enumerated(EnumType.STRING)
     private StatusOrder status = StatusOrder.CRIADO;
@@ -80,5 +88,21 @@ public class OrderEntity {
 
     public void setStatus(StatusOrder status) {
         this.status = status;
+    }
+
+    public UUID getDeliveryManId() {
+        return deliveryManId;
+    }
+
+    public void setDeliveryManId(UUID deliveryManId) {
+        this.deliveryManId = deliveryManId;
+    }
+
+    public DeliveryManEntity getDeliveryManEntity() {
+        return deliveryManEntity;
+    }
+
+    public void setDeliveryManEntity(DeliveryManEntity deliveryManEntity) {
+        this.deliveryManEntity = deliveryManEntity;
     }
 }
