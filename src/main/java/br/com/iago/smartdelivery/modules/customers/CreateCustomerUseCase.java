@@ -1,6 +1,7 @@
 package br.com.iago.smartdelivery.modules.customers;
 
 import br.com.iago.smartdelivery.ViaCepDTO;
+import br.com.iago.smartdelivery.integrations.zipcode.ViaCEPClient;
 import br.com.iago.smartdelivery.modules.customers.dto.CreateCustomerRequest;
 import br.com.iago.smartdelivery.modules.users.CreateUserCase;
 import br.com.iago.smartdelivery.modules.users.Role;
@@ -14,21 +15,25 @@ public class CreateCustomerUseCase {
 
     private CustomerRepository customerRepository;
     private CreateUserCase createUserCase;
+    private ViaCEPClient viaCEPClient;
 
-    public CreateCustomerUseCase(CustomerRepository customerrepository, CreateUserCase createUserCase){
+    public CreateCustomerUseCase(
+            CustomerRepository customerrepository,
+            CreateUserCase createUserCase,
+            ViaCEPClient viaCEPClient
+    ){
         this.customerRepository = customerrepository;
         this.createUserCase = createUserCase;
+        this.viaCEPClient = viaCEPClient;
     }
 
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Transactional
     public void execute(CreateCustomerRequest createCustomerRequest) throws Exception{
-        String urlViaApi = "http://viacep.com.br/ws/"+createCustomerRequest.getZipcode()+"/json/";
-
+        ViaCepDTO viaCepDTO = this.viaCEPClient.findZipCode(createCustomerRequest.getZipcode());
         CustomerEntity customerEntity = new CustomerEntity();
         try{
-            ViaCepDTO viaCepDTO = restTemplate.getForObject(urlViaApi, ViaCepDTO.class);
             customerEntity.setAddress(viaCepDTO.getLogradouro());
         } catch (Exception e) {
             throw new IllegalArgumentException("Erro ao consultar o CEP " + createCustomerRequest.getZipcode());
