@@ -68,10 +68,12 @@ O projeto possui um Docker Compose para facilitar a criação do banco PostgreSQ
 
 Comandos:
 
+```
 docker-compose up -d
 ./mvnw spring-boot:run
+```
 
-A aplicação será iniciada em http://localhost:8080
+A aplicação será iniciada em [http://localhost:8080](http://localhost:8080)
 
 ---
 
@@ -112,20 +114,99 @@ smart-delivery/
 ## 🌐 Integração com ViaCEP
 
 Durante o cadastro de cliente, o sistema consome a API pública do ViaCEP:
+```
 GET https://viacep.com.br/ws/{CEP}/json/
+```
 Os campos de endereço são automaticamente preenchidos com base na resposta.
 
 ---
 
 ## 🔐 Perfis de Usuário
 
-ADMIN: Gerenciar produtos, entregadores e pedidos
-CLIENTE: Criar pedidos e visualizar status
+**ADMIN:** Gerenciar produtos, entregadores e pedidos  
+**CLIENTE:** Criar pedidos e visualizar status
 
 ---
 
 ## 🧾 Status do Pedido
 
-CRIADO → Pedido registrado pelo cliente
-EM_ROTA → Entregador atribuído e entrega iniciada
-ENTREGUE → Pedido finalizado
+| Status | Descrição |
+|---------|------------|
+| CRIADO | Pedido registrado pelo cliente |
+| EM_ROTA | Entregador atribuído e entrega iniciada |
+| ENTREGUE | Pedido finalizado |
+
+---
+
+## 🚀 Rotas
+
+### Cadastro de Clientes (POST)
+**URL:** `http://localhost:8080/customers`  
+**Body:**
+```json
+{
+  "name": "Isabela2",
+  "password": "customer",
+  "phone": "(77) 98872-8483",
+  "email": "isa2@gmail.com",
+  "zipcode": "45051140"
+}
+```
+**Autenticação (Basic Auth):**  
+`admin@smartdelivery.com / admin123`
+
+---
+
+### Cadastro de Produtos (POST)
+**URL:** `http://localhost:8080/products`  
+**Body:**
+```json
+{
+  "code": 1,
+  "description": "Cachorro Quente",
+  "price": 10,
+  "name": "Cachorro Quente"
+}
+```
+**Autenticação (Basic Auth):**  
+`admin@smartdelivery.com / admin123`
+
+---
+
+### Cadastro de Pedidos (POST)
+**URL:** `http://localhost:8080/orders`  
+**Body:**
+```json
+{
+  "productsIds": []
+}
+```
+**Autenticação (Basic Auth):**  
+`admin@smartdelivery.com / admin123`
+
+---
+
+### Cadastro de Entregador (POST)
+**URL:** `http://localhost:8080/deliveryman`  
+**Body:**
+```json
+{
+  "name": "Eduardo",
+  "phone": "7799999-9999",
+  "document": "123456789"
+}
+```
+**Autenticação (Basic Auth):**  
+`admin@smartdelivery.com / admin123`
+
+---
+
+### Alterar Status do Pedido (PUT)
+**URL:** `http://localhost:8080/orders/delivered/{idPedido}`  
+**Autenticação (Basic Auth):**  
+`admin@smartdelivery.com / admin123`
+
+---
+
+### Buscar Todos os Produtos (GET)
+**URL:** `http://localhost:8080/products`
