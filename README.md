@@ -68,37 +68,34 @@ O projeto possui um Docker Compose para facilitar a criação do banco PostgreSQ
 
 Comandos:
 
-```
 docker-compose up -d
 ./mvnw spring-boot:run
-```
 
-A aplicação será iniciada em [http://localhost:8080](http://localhost:8080)
+A aplicação será iniciada em http://localhost:8080
 
 ---
 
 ## 🧩 Estrutura do Projeto
 
+```bash
 smart-delivery/
-│
 ├── src/
 │   ├── main/java/com/iago/smartdelivery/
-│   │   ├── configs/                → Criação de usuário administrador, configuração do RabbitMQ e segurança (Spring Security)
-│   │   ├── integrations/zipCode/   → Integração com a API ViaCEP
-│   │   ├── modules/                → Módulos principais do sistema
-│   │   │   ├── customers/          → Cadastro e gerenciamento de clientes
-│   │   │   ├── deliveryman/        → Cadastro e controle de entregadores
-│   │   │   ├── orders/             → Criação, listagem e atualização de pedidos
-│   │   │   ├── products/           → Cadastro e gerenciamento de produtos
-│   │   │   └── users/              → Autenticação, perfis e controle de acesso
+│   │   ├── configs/            → Configs de Admin, RabbitMQ e Segurança (Spring Security)
+│   │   ├── integrations/zipCode/ → Integração com a API ViaCEP
+│   │   ├── modules/            → Módulos principais do sistema
+│   │   │   ├── customers/      → Cadastro e gerenciamento de clientes
+│   │   │   ├── deliveryman/    → Cadastro e controle de entregadores
+│   │   │   ├── orders/         → Criação, listagem e atualização de pedidos
+│   │   │   ├── products/       → Cadastro e gerenciamento de produtos
+│   │   │   └── users/          → Autenticação, perfis e controle de acesso
 │   └── main/resources/
-│       ├── application.yml         → Configurações da aplicação
+│       ├── application.yml     → Configurações da aplicação
 │       └── ...
 │
-├── docker-compose.yml              → Subida do PostgreSQL e RabbitMQ
-├── pom.xml                         → Dependências do Maven
-└── README.md
-
+├── docker-compose.yml          → Subida do PostgreSQL e RabbitMQ
+└── pom.xml                     → Dependências do Maven
+```
 ---
 
 ## 🧠 Fluxo da Mensageria (RabbitMQ)
@@ -114,99 +111,55 @@ smart-delivery/
 ## 🌐 Integração com ViaCEP
 
 Durante o cadastro de cliente, o sistema consome a API pública do ViaCEP:
-```
 GET https://viacep.com.br/ws/{CEP}/json/
-```
 Os campos de endereço são automaticamente preenchidos com base na resposta.
 
 ---
 
 ## 🔐 Perfis de Usuário
 
-**ADMIN:** Gerenciar produtos, entregadores e pedidos  
-**CLIENTE:** Criar pedidos e visualizar status
+ADMIN: Gerenciar produtos, entregadores e pedidos
+CLIENTE: Criar pedidos e visualizar status
 
 ---
 
 ## 🧾 Status do Pedido
 
-| Status | Descrição |
-|---------|------------|
-| CRIADO | Pedido registrado pelo cliente |
-| EM_ROTA | Entregador atribuído e entrega iniciada |
-| ENTREGUE | Pedido finalizado |
+CRIADO → Pedido registrado pelo cliente
+EM_ROTA → Entregador atribuído e entrega iniciada
+ENTREGUE → Pedido finalizado
 
 ---
 
-## 🚀 Rotas
+## 🌐 Rotas da API (Endpoints)
 
-### Cadastro de Clientes (POST)
-**URL:** `http://localhost:8080/customers`  
-**Body:**
-```json
-{
-  "name": "Isabela2",
-  "password": "customer",
-  "phone": "(77) 98872-8483",
-  "email": "isa2@gmail.com",
-  "zipcode": "45051140"
-}
-```
-**Autenticação (Basic Auth):**  
-`admin@smartdelivery.com / admin123`
+A API REST está disponível em `http://localhost:8080`.
 
----
+| Funcionalidade | Método | Rota | Autenticação | Descrição |
+| :--- | :--- | :--- | :--- | :--- |
+| **Cadastro de Clientes** | `POST` | `/customers` | Basic Auth (ADMIN) | Cria um novo cliente. Necessita de `zipcode` para ViaCEP. |
+| **Busca de Produtos** | `GET` | `/products` | Qualquer | Lista todos os produtos disponíveis. |
+| **Cadastro de Produtos** | `POST` | `/products` | Basic Auth (ADMIN) | Adiciona um novo produto ao catálogo. |
+| **Criação de Pedidos** | `POST` | `/orders` | Basic Auth (CLIENTE) | Cria um novo pedido. Dispara notificação via RabbitMQ. |
+| **Cadastro de Entregador** | `POST` | `/deliveryman` | Basic Auth (ADMIN) | Registra um novo entregador no sistema. |
+| **Alterar Status** | `PUT` | `/orders/delivered/{idPedido}` | Basic Auth (ADMIN) | Atualiza o status do pedido para `ENTREGUE`. |
 
-### Cadastro de Produtos (POST)
-**URL:** `http://localhost:8080/products`  
-**Body:**
-```json
-{
-  "code": 1,
-  "description": "Cachorro Quente",
-  "price": 10,
-  "name": "Cachorro Quente"
-}
-```
-**Autenticação (Basic Auth):**  
-`admin@smartdelivery.com / admin123`
+### Exemplos de Requisição (JSON Body)
+
+| Rota | Exemplo de Body |
+| :--- | :--- |
+| `POST /customers` | `{"name": "Isabela", "password": "customer", "phone": "(77) 98872-8483", "email": "isa2@gmail.com", "zipcode": "45051140"}` |
+| `POST /products` | `{"code": 1, "description": "Cachorro Quente", "price": 10, "name": "Cachorro Quente"}` |
+| `POST /orders` | `{"productsIds": [ 1, 2, 3 ]}` |
+| `POST /deliveryman` | `{"name": "Eduardo", "phone": "7799999-9999", "document": "123456789"}` |
+
+### Credenciais de Teste (Basic Auth)
+
+Utilize as seguintes credenciais para acesso de administrador nos endpoints restritos:
+
+| Usuário | Senha | Perfil |
+| :--- | :--- | :--- |
+| `admin@smartdelivery.com` | `admin123` | ADMIN |
+| *Para CLIENTE, use as credenciais criadas no cadastro.* | | CLIENTE |
 
 ---
-
-### Cadastro de Pedidos (POST)
-**URL:** `http://localhost:8080/orders`  
-**Body:**
-```json
-{
-  "productsIds": []
-}
-```
-**Autenticação (Basic Auth):**  
-`admin@smartdelivery.com / admin123`
-
----
-
-### Cadastro de Entregador (POST)
-**URL:** `http://localhost:8080/deliveryman`  
-**Body:**
-```json
-{
-  "name": "Eduardo",
-  "phone": "7799999-9999",
-  "document": "123456789"
-}
-```
-**Autenticação (Basic Auth):**  
-`admin@smartdelivery.com / admin123`
-
----
-
-### Alterar Status do Pedido (PUT)
-**URL:** `http://localhost:8080/orders/delivered/{idPedido}`  
-**Autenticação (Basic Auth):**  
-`admin@smartdelivery.com / admin123`
-
----
-
-### Buscar Todos os Produtos (GET)
-**URL:** `http://localhost:8080/products`
